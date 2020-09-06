@@ -6,56 +6,61 @@
 #    By: gbourgeo <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2015/04/01 03:10:34 by gbourgeo          #+#    #+#              #
-#    Updated: 2016/05/27 12:01:26 by gbourgeo         ###   ########.fr        #
+#    Updated: 2020/09/06 18:46:15 by gbourgeo         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
-NAME = wolf3d
+NAME	= wolf3d
 
-SRC = ft_end.c \
-	ft_free.c \
-	get_map.c \
-	get_next_line.c \
-	main.c \
-	draw.c \
-	ft_raycast.c \
-	move.c \
-	wolf.c
+SRC_D	= srcs/
+SRC 	=				\
+		main.c			\
+		draw.c			\
+		ft_end.c		\
+		ft_free.c		\
+		ft_raycast.c	\
+		get_map.c		\
+		get_next_line.c	\
+		map_error.c		\
+		move.c			\
+		wolf.c			\
 
-OBJ_DIR = obj/
+OBJ_D	= objs/
 
-OBJ = $(addprefix $(OBJ_DIR), $(SRC:.c=.o))
+OBJ 	= $(addprefix $(OBJ_D), $(SRC:.c=.o))
 
-LIBFT = libft
+LIBFT	= libft
 
-HDR = $(LIBFT)/includes
+INCLUDES= -Iincludes -I$(LIBFT)/includes -I/usr/local/include/
 
-LIBX = /usr/local/lib -lmlx -framework OpenGL -framework AppKit
+LIBS	=  -L$(LIBFT) -lft -L/usr/local/lib -lmlx -framework OpenGL -framework AppKit
 
-HDR_X = /usr/local/include/
+CC		= gcc
 
-WWW = gcc -Wall -Werror -Wextra
+CFLAGS 	= -Wall -Werror -Wextra
 
-all: lib $(NAME)
+all: lib $(OBJ_D) $(NAME)
 
 lib:
 	@make -C $(LIBFT)
-	@if ! test -d $(OBJ_DIR); then mkdir -p $(OBJ_DIR); echo mkdir -p $(OBJ_DIR); fi
+
+$(OBJ_D):
+	@mkdir -p $@
 
 $(NAME): $(OBJ)
-	$(WWW) -o $@ $^ -L $(LIBX) -L $(LIBFT) -lft
+	$(CC) -o $@ $^ -L $(LIBS)
 
-$(OBJ_DIR)%.o: %.c
-	$(WWW) -o $@ -c $^ -I $(HDR) -I $(HDR_X)
+$(OBJ_D)%.o: $(SRC_D)%.c
+	$(CC) $(CFLAGS) -o $@ -c $^ $(INCLUDES)
 
 clean:
 	@make -C $(LIBFT) clean
-	@if test -d $(OBJ_DIR); then /bin/rm -rf $(OBJ_DIR); echo rm -f $(OBJ); fi
+	@/bin/rm -rf $(OBJ_D)
 
 fclean: clean
 	@make -C $(LIBFT) fclean
-	@if test -f $(NAME); then /bin/rm -f $(NAME); echo rm -f $(NAME); fi
+	@/bin/rm -f $(NAME)
 
 re: fclean all
 
-.PHONY: clean fclean re
+.PHONY: libft $(OBJ_D) clean fclean re
